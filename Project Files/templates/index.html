@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Sorting - AI-Powered Fruit & Vegetable Quality Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .feature-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .cta-section {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 50px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            border: 0px solid;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #764ba2;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .result-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .result-image {
+            max-width: 400px;
+            max-height: 400px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .result-text {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .fresh {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .rotten {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .confidence {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .navigation {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 50px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <div class="container">
+        <nav class="navigation">
+            <div class="nav-links">
+                <a href="#" class="nav-link" onclick="showSection('home')">🏠 Home</a>
+                <a href="#" class="nav-link" onclick="showSection('predict')">🔍 Predict</a>
+                <a href="#" class="nav-link" onclick="showSection('about')">ℹ️ About</a>
+            </div>
+        </nav>
+
+        <!-- Home Section -->
+        <div id="home-section" class="section">
+            <div class="header">
+                <h1>🍎 Smart Sorting</h1>
+                <p>AI-Powered Fruit & Vegetable Quality Detection using Transfer Learning</p>
+            </div>
+
+            <div class="features">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>AI-Powered Detection</h3>
+                    <p>Advanced deep learning models trained on thousands of images to accurately identify fresh vs rotten produce with high precision.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Real-time Analysis</h3>
+                    <p>Get instant results within seconds. Upload an image and receive immediate classification with confidence scores.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>High Accuracy</h3>
+                    <p>Utilizing transfer learning with pre-trained models like VGG16 and ResNet50 for superior accuracy in food quality assessment.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌱</div>
+                    <h3>Reduce Food Waste</h3>
+                    <p>Help minimize food waste by making informed decisions about produce quality in supermarkets, restaurants, and homes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Easy to Use</h3>
+                    <p>Simple drag-and-drop interface that works on any device. No technical expertise required - just upload and get results.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔬</div>
+                    <h3>Scientific Approach</h3>
+                    <p>Built using state-of-the-art computer vision techniques and validated on comprehensive datasets for reliable performance.</p>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h2 style="color: white; margin-bottom: 20px;">Ready to Test Your Produce?</h2>
+                <p style="color: rgba(255,255,255,0.9); margin-bottom: 30px;">Upload an image of fruits or vegetables and let our AI determine their quality instantly.</p>
+                <button class="btn" onclick="showSection('predict')">Start Detection</button>
+            </div>
+        </div>
+
+        <!-- Predict Section -->
+        <div id="predict-section" class="section" style="display: none;">
+            <div class="header">
+                <h1>🔍 Quality Detection</h1>
+                <p>Upload an image to analyze fruit and vegetable quality</p>
+            </div>
+
+            <div class="upload-section">
+                <h2 style="text-align: center; margin-bottom: 30px; color: #667eea;">Upload Your Image</h2>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📸</div>
+                    <h3>Drag & Drop Your Image Here</h3>
+                    <p style="margin: 20px 0; color: #666;">or click to browse files</p>
+                    <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input" accept="image/*" onchange="handleFileSelect(this)">
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Analyzing image... Please wait</p>
+                </div>
+            </div>
+
+            <div class="result-section" id="resultSection" style="display: none;">
+                <h2 style="margin-bottom: 30px; color: #667eea;">Analysis Results</h2>
+                <img id="resultImage" class="result-image" src="" alt="Uploaded image">
+                <div id="resultText" class="result-text"></div>
+                <div id="confidenceText" class="confidence"></div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <button class="btn" onclick="resetPrediction()">Analyze Another Image</button>
+            </div>
+        </div>
+
+        <!-- About Section -->
+        <div id="about-section" class="section" style="display: none;">
+            <div class="header">
+                <h1>ℹ️ About Smart Sorting</h1>
+                <p>Learn about our AI-powered food quality detection system</p>
+            </div>
+
+            <div class="upload-section">
+                <h2 style="color: #667eea; margin-bottom: 20px;">How It Works</h2>
+                <div style="text-align: left; line-height: 1.8;">
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🧠 Transfer Learning Approach</h3>
+                    <p style="margin-bottom: 20px;">Our system uses advanced transfer learning techniques, leveraging pre-trained convolutional neural networks (CNNs) like VGG16 and ResNet50. These models, originally trained on millions of images, are fine-tuned specifically for food quality detection.</p>
+
+                    <h3 style="color: #667eea; margin-bottom: 15px;">📊 Data Processing Pipeline</h3>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>Image Preprocessing:</strong> Images are resized, normalized, and augmented for optimal model performance</li>
+                        <li><strong>Feature Extraction:</strong> Deep learning layers extract meaningful features from produce images</li>
+                        <li><strong>Classification:</strong> Final layers classify images as 'Fresh' or 'Rotten' with confidence scores</li>
+                        <li><strong>Post-processing:</strong> Results are processed and presented with visual feedback</li>
+                    </ul>
+
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🎯 Applications</h3>
+                    <ul style="margin-bottom: 20px; padding-left: 20px;">
+                        <li><strong>Food Processing Plants:</strong> Automated quality control on production lines</li>
+                        <li><strong>Supermarkets:</strong> Quick quality assessment before stocking shelves</li>
+                        <li><strong>Restaurants:</strong> Ensure only fresh ingredients are used in food preparation</li>
+                        <li><strong>Smart Homes:</strong> Help families reduce food waste and manage inventory</li>
+                        <li><strong>Agricultural Operations:</strong> Post-harvest quality assessment</li>
+                    </ul>
+
+                    <h3 style="color: #667eea; margin-bottom: 15px;">🔬 Technical Specifications</h3>
+                    <ul style="padding-left: 20px;">
+                        <li><strong>Model Architecture:</strong> Transfer Learning with VGG16/ResNet50 backbone</li>
+                        <li><strong>Input Size:</strong> 224x224 RGB images</li>
+                        <li><strong>Data Augmentation:</strong> Rotation, scaling, flipping, and color adjustments</li>
+                        <li><strong>Framework:</strong> TensorFlow/Keras with Flask web interface</li>
+                        <li><strong>Supported Formats:</strong> JPG, PNG, JPEG, GIF</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 Smart Sorting System. Built with AI for a better tomorrow. 🌱</p>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentFile = null;
+
+        // Section navigation
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(sectionName + '-section').style.display = 'block';
+        }
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect({ files: files });
+            }
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Handle file selection
+        function handleFileSelect(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please select a valid image file (JPG, PNG, GIF)');
+                return;
+            }
+
+            // Validate file size (16MB max)
+            if (file.size > 16 * 1024 * 1024) {
+                alert('File size must be less than 16MB');
+                return;
+            }
+
+            currentFile = file;
+            predictImage(file);
+        }
+
+        // Predict image function
+        function predictImage(file) {
+            const loading = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+            
+            // Show loading
+            loading.style.display = 'block';
+            resultSection.style.display = 'none';
+
+            // Create FormData
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Make API call
+            fetch('/api/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+
+                displayResult(file, data.predicted_class, data.confidence);
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                alert('Error: ' + error.message);
+                console.error('Error:', error);
+            });
+        }
+
+        // Display prediction result
+        function displayResult(file, predictedClass, confidence) {
+            const resultSection = document.getElementById('resultSection');
+            const resultImage = document.getElementById('resultImage');
+            const resultText = document.getElementById('resultText');
+            const confidenceText = document.getElementById('confidenceText');
+            const progressFill = document.getElementById('progressFill');
+
+            // Display image
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                resultImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Display result
+            const isFresh = predictedClass.toLowerCase().includes('fresh');
+            resultText.innerHTML = `Result: <span class="${isFresh ? 'fresh' : 'rotten'}">${predictedClass}</span>`;
+            confidenceText.textContent = `Confidence: ${confidence}%`;
+            
+            // Animate progress bar
+            setTimeout(() => {
+                progressFill.style.width = confidence + '%';
+            }, 500);
+
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Reset prediction
+        function resetPrediction() {
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('fileInput').value = '';
+            currentFile = null;
+            
+            // Scroll back to upload area
+            document.getElementById('uploadArea').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('home');
+        });
+    </script>
+</body>
+</html>
